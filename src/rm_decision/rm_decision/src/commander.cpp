@@ -18,6 +18,8 @@
 #include <vector>
 #include <fstream>
 #include <cmath>
+#include <bitset>
+
 #include "rm_decision/commander.hpp"
 
 #include <nav2_msgs/action/navigate_to_pose.hpp>
@@ -48,7 +50,6 @@ namespace rm_decision
       currentpose.pose.orientation.y = 0.0;
       currentpose.pose.orientation.z = 0.0;
       currentpose.pose.orientation.w = 1.0;
-      move =move_points_.begin();
       attack = Route3_points_.begin();
       goal = currentpose;
       tf2_buffer_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());
@@ -72,7 +73,7 @@ namespace rm_decision
       executor_thread_ = std::thread(&Commander::executor, this);
       self_cmd_thread_ = std::thread(&Commander::self_cmd, this);
    }
-   // 析构函数
+   // 析构函数f
    Commander::~Commander(){
       if(commander_thread_.joinable()){
          commander_thread_.join();
@@ -89,7 +90,7 @@ namespace rm_decision
 
    // 处理信息线程(设置状态）(now using behave tree)
    void Commander::decision(){
-        rclcpp::Rate r(5);
+        rclcpp::Rate r(0.5);
         // behavetree init
         BT::BehaviorTreeFactory factory;
         factory.registerSimpleCondition("wait_for_start", std::bind(&Commander::wait_for_start, this));
@@ -157,37 +158,40 @@ namespace rm_decision
 
       while(rclcpp::ok()){
          if(self_hp == 0){
-            msg.sentry_cmd |= (1 << 0);
+            msg.sentry_cmd |= (1 << 31);
          }
-         if(self_hp == 0 && goldcoin > 500){
-            msg.sentry_cmd |= (1 << 1);
+         if(self_hp == 0 && goldcoin > 200){
+            msg.sentry_cmd |= (1 << 30);
          }
-         if(self_ammo < 50 && goldcoin > 500){
-            buy_ammo = 200;
-            for (int i = 2; i <= 12; ++i) {
-            msg.sentry_cmd &= ~(1 << i);
-            }
-            msg.sentry_cmd |= (buy_ammo << 2);
-         }
-         if(self_ammo < 50 && goldcoin < 300 && goldcoin > 100){
-            buy_ammo = 100;
-            for (int i = 2; i <= 12; ++i) {
-            msg.sentry_cmd &= ~(1 << i);
-            }
-            msg.sentry_cmd |= (buy_ammo << 2);
-         }
-         if(self_ammo < 50 && goldcoin < 150 && goldcoin > 50){
-            buy_ammo = 50;
-            for (int i = 2; i <= 12; ++i) {
-            msg.sentry_cmd &= ~(1 << i);
-            }
-            msg.sentry_cmd |= (buy_ammo << 2);
-         }
-         if(self_hp < 100 && goldcoin > 300){
-            buy_hp ++;
-            msg.sentry_cmd |= (buy_hp << 17);
-         }
+         // if(self_ammo < 50 && goldcoin > 500){
+         //    buy_ammo = 200;
+         //    for (int i = 2; i <= 12; ++i) {
+         //    msg.sentry_cmd &= ~(1 << i);
+         //    }
+         //    msg.sentry_cmd |= (buy_ammo << 2);
+         // }
+         // if(self_ammo < 50 && goldcoin < 300 && goldcoin > 100){
+         //    buy_ammo = 100;
+         //    for (int i = 2; i <= 12; ++i) {
+         //    msg.sentry_cmd &= ~(1 << i);
+         //    }
+         //    msg.sentry_cmd |= (buy_ammo << 2);
+         // }
+         // if(self_ammo < 50 && goldcoin < 150 && goldcoin > 50){
+         //    buy_ammo = 50;
+         //    for (int i = 2; i <= 12; ++i) {
+         //    msg.sentry_cmd &= ~(1 << i);
+         //    }
+         //    msg.sentry_cmd |= (buy_ammo << 2);
+         // }
+         // if(self_hp < 100 && goldcoin > 300){
+         //    buy_hp ++;
+         //    msg.sentry_cmd |= (buy_hp << 17);
+         // }
          sentry_cmd_pub_->publish(msg);
+         std::bitset<32> binary(msg.sentry_cmd);
+         std::cout << binary << std::endl;
+         
          r.sleep();
       }
    
@@ -295,7 +299,6 @@ namespace rm_decision
       random = Patrol_points_.begin();
       Route3_points_ = list_name.at(2);
       attack = Route3_points_.begin();
-      move_points_ = list_name.at(1);
       move = Route2_points_.begin();
       
    }
@@ -324,7 +327,6 @@ namespace rm_decision
       color = msg->color;
       self_ammo = msg->projectile_allowance_17mm;
       goldcoin = msg->remaining_gold_coin;
-
       if(msg->color == 1){
          self_hp = msg->red_7;
          self_base = msg->red_base_hp;
@@ -347,6 +349,7 @@ namespace rm_decision
             base = true;
          }
       }
+      // RCLCPP_INFO(this->get_logger(), "自身血量: %f, 自身弹量: %f, 自身金币: %f color: %d, gamestary: %d",self_hp,self_ammo,goldcoin,color,gamestart);
    }
 
    void Commander::aim_callback(const auto_aim_interfaces::msg::Target::SharedPtr msg) {
@@ -409,14 +412,19 @@ namespace rm_decision
    
    //振荡模式
    void MoveState::handle() {
-      if(commander->checkgoal){
-         commander->nav_to_pose(*commander->move);
-         commander->move++;
-         if(commander->move == commander->move_points_.end()){
-            commander->move = commander->move_points_.begin();
-         }
-         commander->checkgoal = false;
-      }
+       if (commander->move_points_.empty()) {
+           commander->move_points_ = commander->generateRandomPoints(10, 1);
+           commander->move = commander->move_points_.begin();
+       }
+
+       if (commander->checkgoal) {
+           commander->nav_to_pose(*commander->move);
+           commander->move++;
+           if (commander->move == commander->move_points_.end()) {
+               commander->move = commander->move_points_.begin();
+           }
+           commander->checkgoal = false;
+       }
    }
 
    void CjState::handle() {
@@ -475,6 +483,28 @@ namespace rm_decision
       currentpose.pose.orientation = odom_msg.transform.rotation;
       RCLCPP_INFO(this->get_logger(), "当前位置: %.2f, %.2f, %.2f",currentpose.pose.position.x,currentpose.pose.position.y,currentpose.pose.position.z);
    }
+
+
+    // 生成随机点
+    std::vector<geometry_msgs::msg::PoseStamped> Commander::generateRandomPoints(int num_points, double radius) {
+        getcurrentpose();
+        std::vector<geometry_msgs::msg::PoseStamped> points;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<> dis(-radius, radius);
+
+        for (int i = 0; i < num_points; ++i) {
+            geometry_msgs::msg::PoseStamped point;
+            point.header.frame_id = "map";
+            point.pose.position.x = currentpose.pose.position.x + dis(gen);
+            point.pose.position.y = currentpose.pose.position.y + dis(gen);
+            point.pose.position.z = currentpose.pose.position.z;
+            point.pose.orientation = currentpose.pose.orientation;
+            points.push_back(point);
+        }
+
+        return points;
+    }
 
 } // namespace rm_decision
 #include "rclcpp_components/register_node_macro.hpp"

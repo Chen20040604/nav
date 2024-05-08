@@ -164,6 +164,8 @@ public:
 
   void getcurrentpose();
 
+  std::vector<geometry_msgs::msg::PoseStamped> generateRandomPoints(int num_points, double radius) ;
+
   // double timer();
 
   geometry_msgs::msg::PoseStamped currentpose;
@@ -173,7 +175,7 @@ public:
   std::vector<geometry_msgs::msg::PoseStamped> Route2_points_;
   std::vector<geometry_msgs::msg::PoseStamped> Route3_points_;
   std::vector<geometry_msgs::msg::PoseStamped> move_points_;
-  std::vector<std::vector<geometry_msgs::msg::PoseStamped>> list_name = {Route1_points_,Route2_points_,Route3_points_,move_points_};
+  std::vector<std::vector<geometry_msgs::msg::PoseStamped>> list_name = {Route1_points_,Route2_points_,Route3_points_};
   
   std::vector<geometry_msgs::msg::PoseStamped>::iterator random;
   std::vector<geometry_msgs::msg::PoseStamped>::iterator attack;
@@ -310,12 +312,13 @@ public:
         setState(std::make_shared<GoAndStayState>(this));
         order = true;
     }
+    // 上面都是进攻的
     void myaddhp_handle(){
         std::cout << "addhp_handle is called" << std::endl;
         goal.header.stamp = this->now();
         goal.header.frame_id = "map";
-        goal.pose.position.x = 0; 
-        goal.pose.position.y = 0;
+        goal.pose.position.x = -1.5; 
+        goal.pose.position.y = 2;
         goal.pose.position.z = 0.0;
         goal.pose.orientation.x = 0.0;
         goal.pose.orientation.y = 0.0;
@@ -328,8 +331,8 @@ public:
         std::cout << "defend_handle is called" << std::endl;
         goal.header.stamp = this->now();
         goal.header.frame_id = "map";
-        goal.pose.position.x = 0; 
-        goal.pose.position.y = 0;
+        goal.pose.position.x = -3; 
+        goal.pose.position.y = 3;
         goal.pose.position.z = 0.0;
         goal.pose.orientation.x = 0.0;
         goal.pose.orientation.y = 0.0;
@@ -354,12 +357,13 @@ public:
     }
 
     BT::NodeStatus wait_for_start(){
-        if (gamestart) {
-          return BT::NodeStatus::FAILURE;
-        }
-        else {
-          return BT::NodeStatus::SUCCESS;
-        }
+        // if (gamestart) {
+        //   return BT::NodeStatus::FAILURE;
+        // }
+        // else {
+        //   return BT::NodeStatus::SUCCESS;
+        // }
+        return BT::NodeStatus::FAILURE;
     }
 
     BT::NodeStatus dafu_ordered(){
@@ -390,25 +394,27 @@ public:
     }
 
   BT::NodeStatus IfAddHp(){
-    if (self_hp <= 150 || self_ammo < 50) {
-      return BT::NodeStatus::SUCCESS;
-    }
-    else {
+    // if (self_hp <= 150 || self_ammo < 50) {
+    //   return BT::NodeStatus::SUCCESS;
+    // }
+    // else {
+    //   return BT::NodeStatus::FAILURE;
+    // }
       return BT::NodeStatus::FAILURE;
-    }
     }
 
   BT::NodeStatus IfDefend(){
-    if(self_base <= 150){
-    return BT::NodeStatus::SUCCESS;
-    }
-    else {
+    // if(self_base <= 150){
+    // return BT::NodeStatus::SUCCESS;
+    // }
+    // else {
+    // return BT::NodeStatus::FAILURE;
+    // }
     return BT::NodeStatus::FAILURE;
-    }
     }
 
   BT::NodeStatus IfAttack(){
-    if(self_hp >= 200 && distence(enemypose) <= 3.0){
+    if(self_hp >= 1000 && distence(enemypose) <= 3.0){
       return BT::NodeStatus::SUCCESS;
     }
     else {
@@ -417,12 +423,13 @@ public:
     }
 
   BT::NodeStatus IfGuard(){
-      if(!order){
-          return BT::NodeStatus::SUCCESS;
-      }
-      else {
-          return BT::NodeStatus::FAILURE;
-      }
+      // if(!order){
+      //     return BT::NodeStatus::SUCCESS;
+      // }
+      // else {
+      //     return BT::NodeStatus::FAILURE;
+      // }
+      return BT::NodeStatus::FAILURE;
     }
 
 
@@ -487,7 +494,8 @@ public:
             return BT::NodeStatus::RUNNING;
         }
         else {
-            return BT::NodeStatus::FAILURE;
+            // return BT::NodeStatus::FAILURE;
+            return BT::NodeStatus::SUCCESS;
         }
       }
 

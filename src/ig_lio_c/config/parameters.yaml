@@ -47,7 +47,7 @@ map_builder_node:
 
     localizer:
       reloc_on_init: False
-      pcd_path: "/home/mechax/Desktop/sentry_ig/octomapfg_output.pcd"
+      pcd_path: "/home/mechax/Desktop/nav/octomapfg_output.pcd"
       xyz_rpy: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       refine_resolution: 0.15
       rough_resolution: 0.3
