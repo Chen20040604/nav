@@ -1,0 +1,102 @@
+map_builder_node:
+  ros__parameters:
+    use_sim_time: False
+    map_frame: map
+    local_frame: odom
+    body_frame: livox_frame
+    imu_topic: /imu/data
+    livox_topic: /livox/lidar
+    dynamic_point_cloud_removal_config: config_fg.yaml
+    local_rate: 300.0
+    loop_rate_lc: 0.5
+    loop_rate_l: 0.25
+    blind: 0.4
+
+    lio_builder:
+      scan_resolution: 0.3
+      map_resolution: 0.3
+      point2plane_gain: 100.0
+      gicp_constraint_gain: 100.0
+      map_capacity: 5000000
+      grid_capacity: 20
+      extrinsic_est_en: false
+      align_gravity: false
+      set_initpose: true
+      near_mode: 1
+      acc_cov: 0.1
+      gyr_cov: 0.1
+      ba_cov: 0.00001
+      bg_cov: 0.00001
+      imu_ext_rot: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+      imu_ext_pos: [-0.011, -0.02329, 0.04412]
+
+    lio_slam:
+      ext_r: [0., 0., 0.]
+      ext_t: [-0.0151, 0., 0.]
+
+    loop_closure:
+      activate: True
+      rad_thresh: 0.2
+      dist_thresh: 1.0
+      time_thresh: 30.0
+      loop_pose_search_radius: 30.0
+      loop_pose_index_thresh: 25
+      submap_resolution: 0.3
+      submap_search_num: 25
+      loop_icp_thresh: 0.3
+
+    localizer:
+      reloc_on_init: False
+      pcd_path: "/home/mechax/Desktop/sentry_ig/octomapfg_output.pcd"
+      xyz_rpy: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      refine_resolution: 0.15
+      rough_resolution: 0.3
+      refine_iter: 5.
+      rough_iter: 10.
+      thresh: 0.15
+      xy_offset: 1.0
+      yaw_offset: 3
+      yaw_resolution: 0.1
+
+occupancy_grid_converter:
+  ros__parameters:
+    use_sim_time: False
+    robot_frame: base_link
+    grid_map_cloud_size: 10
+    occupancyGriddataMin: 0.65
+    occupancyGriddataMax: 20.0
+    min_distance: 0.4
+
+    filters_local:
+      filter1:
+        name: surface_normals
+        type: gridMapFilters/NormalVectorsFilter
+        params:
+          input_layer: elevation
+          output_layers_prefix: normal_vectors_
+          radius: 0.2
+          normal_vector_positive_axis: z
+
+      filter2:
+        name: slope
+        type: gridMapFilters/MathExpressionFilter
+        params:
+          output_layer: slope
+          expression: acos(normal_vectors_z)
+  
+    filters_map:
+      filter1:
+        name: surface_normals
+        type: gridMapFilters/NormalVectorsFilter
+        params:
+          input_layer: elevation
+          output_layers_prefix: normal_vectors_
+          radius: 0.2
+          normal_vector_positive_axis: z
+
+      filter2:
+        name: slope
+        type: gridMapFilters/MathExpressionFilter
+        params:
+          output_layer: slope
+          expression: acos(normal_vectors_z)

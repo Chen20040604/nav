@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4"
+      main_tree_to_execute="main">
+  <BehaviorTree ID="main">
+    <Fallback>
+      <wait_for_start/>
+      <Sequence>
+        <dafu_ordered/>
+        <dafu_handle/>
+      </Sequence>
+      <Sequence>
+        <outpose_ordered/>
+        <outpose_handle/>
+      </Sequence>
+      <Sequence>
+        <base_ordered/>
+        <base_handle/>
+      </Sequence>
+      <Sequence>
+        <IfAddHp/>
+        <addhp_handle/>
+      </Sequence>
+      <Sequence>
+        <IfDefend/>
+        <defend_handle/>
+      </Sequence>
+      <Sequence>
+        <IfAttack/>
+        <attack_handle/>
+      </Sequence>
+      <Sequence>
+        <IfGuard/>
+        <Guard/>
+      </Sequence>
+      <MoveAround/>
+    </Fallback>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Action ID="Guard"
+            editable="true"/>
+    <Condition ID="IfAddHp"
+               editable="true"/>
+    <Condition ID="IfAttack"
+               editable="true"/>
+    <Condition ID="IfDefend"
+               editable="true"/>
+    <Condition ID="IfGuard"
+               editable="true"/>
+    <Action ID="MoveAround"
+            editable="true"/>
+    <Action ID="addhp_handle"
+            editable="true"/>
+    <Action ID="attack_handle"
+            editable="true"/>
+    <Action ID="base_handle"
+            editable="true"/>
+    <Condition ID="base_ordered"
+               editable="true"/>
+    <Action ID="dafu_handle"
+            editable="true"/>
+    <Condition ID="dafu_ordered"
+               editable="true"/>
+    <Action ID="defend_handle"
+            editable="true"/>
+    <Action ID="outpose_handle"
+            editable="true"/>
+    <Condition ID="outpose_ordered"
+               editable="true"/>
+    <Condition ID="wait_for_start"
+               editable="true"/>
+  </TreeNodesModel>
+
+</root>

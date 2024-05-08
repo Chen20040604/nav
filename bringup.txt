@@ -1,0 +1,6 @@
+sudo chmod 777 /dev/ttyUSB0
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+ros2 service call /CovertMap ig_lio_c_msgs/srv/CovertMap "{pcd_path: '/home/mechax/Desktop/sentry_ig/octomapfg_output.pcd',map_file_name: '1_map'}"
+ros2 service call /SaveMap ig_lio_c_msgs/srv/SaveMap "{save_path: '/home/mechax/Desktop/sentry_ig', resolution: 0.05}"
+
+

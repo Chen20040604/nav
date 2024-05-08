@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4" project_name="Project">
+    <include path="sentry_bt.xml"/>
+    <!-- Description of Node Models (used by Groot) -->
+    <TreeNodesModel>
+        <Action ID="Guard" editable="true"/>
+        <Condition ID="IfAddHp" editable="true"/>
+        <Condition ID="IfAddHpConditionOk" editable="true"/>
+        <Condition ID="IfAttack" editable="true"/>
+        <Condition ID="IfDefend" editable="true"/>
+        <Condition ID="IfGuard" editable="true"/>
+        <Condition ID="IfHighHp" editable="true"/>
+        <Condition ID="IfOrdered" editable="true"/>
+        <Action ID="MoveAround" editable="true"/>
+        <Action ID="addhp_handle" editable="true"/>
+        <Action ID="attack_handle" editable="true"/>
+        <Action ID="base_handle" editable="true"/>
+        <Condition ID="base_ordered" editable="true"/>
+        <Action ID="dafu_handle" editable="true"/>
+        <Condition ID="dafu_ordered" editable="true"/>
+        <Action ID="defend_handle" editable="true"/>
+        <Action ID="outpose_handle" editable="true"/>
+        <Condition ID="outpose_ordered" editable="true"/>
+    </TreeNodesModel>
+</root>
