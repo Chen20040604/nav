@@ -30,6 +30,23 @@ RMSerialDriver::RMSerialDriver(const rclcpp::NodeOptions & options)
   RCLCPP_INFO(get_logger(), "Start RMSerialDriver!");
 
   getParams();
+  tf_buffer_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());
+  tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+  static_broadcaster = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
+
+  geometry_msgs::msg::TransformStamped static_transform;
+  static_transform.header.frame_id = "map";
+  static_transform.child_frame_id = "gamemap";
+  static_transform.transform.translation.x = x;
+  static_transform.transform.translation.y = y;
+  static_transform.transform.translation.z = 0.0;
+  tf2::Quaternion quat;
+  quat.setRPY(0.0, 0.0, yaw); // Roll, Pitch, Yaw
+  static_transform.transform.rotation.x = quat.x();
+  static_transform.transform.rotation.y = quat.y();
+  static_transform.transform.rotation.z = quat.z();
+  static_transform.transform.rotation.w = quat.w();
+  static_broadcaster->sendTransform(static_transform);
 
   // Create Publisher
   to_decision_pub_ = this->create_publisher<rm_decision_interfaces::msg::FromSerial>("fromjudge", 10);
@@ -71,6 +88,8 @@ RMSerialDriver::RMSerialDriver(const rclcpp::NodeOptions & options)
   from_decision_sub_ = this->create_subscription<rm_decision_interfaces::msg::ToSerial>
           ("sentry/cmd",rclcpp::SensorDataQoS(),
            std::bind(&RMSerialDriver::decisionSendData,this,std::placeholders::_1));
+  path_sub_ = this->create_subscription<nav_msgs::msg::Path>("path", rclcpp::SensorDataQoS(),
+           std::bind(&RMSerialDriver::pathSendData,this,std::placeholders::_1));
 
 }
 
@@ -245,6 +264,43 @@ void RMSerialDriver::decisionSendData(const rm_decision_interfaces::msg::ToSeria
     //crc16::Append_CRC16_Check_Sum(reinterpret_cast<uint8_t *>(&packet), sizeof(packet));
 }
 
+void RMSerialDriver::pathSendData(const nav_msgs::msg::Path::SharedPtr msg)
+{
+  std::vector<geometry_msgs::msg::PoseStamped> transformed_poses;
+  int size = 50;
+  // 转换每个位姿
+  for (auto &pose_stamped : msg->poses){
+    geometry_msgs::msg::PoseStamped transformed_pose;
+
+    // 尝试进行转换
+    try
+    {
+      tf_buffer_->transform(pose_stamped, transformed_pose, "gamemap");
+    }
+    catch (tf2::TransformException &ex)
+    {
+      RCLCPP_WARN(this->get_logger(), "Transform error: %s", ex.what());
+      return;
+    }
+    transformed_poses.push_back(transformed_pose);
+  }
+  sendpacket.first_pos_x = transformed_poses.front().pose.position.x*10;
+  sendpacket.first_pos_y = transformed_poses.front().pose.position.y * 10;
+  if (transformed_poses.size() > 50)
+  {
+    size = 50;
+  }
+  else
+  {
+    size = transformed_poses.size();
+  }
+  for(int i = 0; i < size; i++)
+  {
+    sendpacket.d_path_x[i] = transformed_poses[i+1].pose.position.x*10-transformed_poses[i].pose.position.x*10;
+    sendpacket.d_path_y[i] = transformed_poses[i+1].pose.position.y * 10 - transformed_poses[i].pose.position.y * 10;
+  }
+}
+
 void RMSerialDriver::getParams()
 {
   using FlowControl = drivers::serial_driver::FlowControl;
@@ -255,6 +311,10 @@ void RMSerialDriver::getParams()
   auto fc = FlowControl::NONE;
   auto pt = Parity::NONE;
   auto sb = StopBits::ONE;
+
+  x = declare_parameter<float>("x", 0.0);
+  y = declare_parameter<float>("y", 0.0);
+  yaw = declare_parameter<float>("yaw", 0.0);
 
   try {
     device_name_ = declare_parameter<std::string>("device_name", "");

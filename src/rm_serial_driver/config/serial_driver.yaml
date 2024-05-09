@@ -6,3 +6,7 @@
     parity: none
     stop_bits: "1"
 
+    x: 1.0
+    y: 1.0
+    yaw: 3.14
+
