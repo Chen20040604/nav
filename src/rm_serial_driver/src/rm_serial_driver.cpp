@@ -15,6 +15,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include "rm_serial_driver/crc.hpp"
 #include "rm_serial_driver/packet.hpp"
@@ -33,6 +34,11 @@ RMSerialDriver::RMSerialDriver(const rclcpp::NodeOptions & options)
   tf_buffer_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());
   tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
   static_broadcaster = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
+
+  double x0 = 5.0;
+  double y0 = 5.0;
+  double x1 = 5.0;
+  double y1 = 5.0;
 
   geometry_msgs::msg::TransformStamped static_transform;
   static_transform.header.frame_id = "map";
@@ -268,37 +274,40 @@ void RMSerialDriver::pathSendData(const nav_msgs::msg::Path::SharedPtr msg)
 {
   std::vector<geometry_msgs::msg::PoseStamped> transformed_poses;
   int size = 50;
-  // 转换每个位姿
-  for (auto &pose_stamped : msg->poses){
-    geometry_msgs::msg::PoseStamped transformed_pose;
+  // sendpacket.intention = 3;
+  // sendpacket.sender_id = 0;
+  // // 转换每个位姿
+  // for (auto &pose_stamped : msg->poses)
+  // {
+  //   geometry_msgs::msg::PoseStamped transformed_pose;
 
-    // 尝试进行转换
-    try
-    {
-      tf_buffer_->transform(pose_stamped, transformed_pose, "gamemap");
-    }
-    catch (tf2::TransformException &ex)
-    {
-      RCLCPP_WARN(this->get_logger(), "Transform error: %s", ex.what());
-      return;
-    }
-    transformed_poses.push_back(transformed_pose);
-  }
-  sendpacket.first_pos_x = transformed_poses.front().pose.position.x*10;
-  sendpacket.first_pos_y = transformed_poses.front().pose.position.y * 10;
-  if (transformed_poses.size() > 50)
-  {
-    size = 50;
-  }
-  else
-  {
-    size = transformed_poses.size();
-  }
-  for(int i = 0; i < size; i++)
-  {
-    sendpacket.d_path_x[i] = transformed_poses[i+1].pose.position.x*10-transformed_poses[i].pose.position.x*10;
-    sendpacket.d_path_y[i] = transformed_poses[i+1].pose.position.y * 10 - transformed_poses[i].pose.position.y * 10;
-  }
+  //   // 尝试进行转换
+  //   try
+  //   {
+  //     tf_buffer_->transform(pose_stamped, transformed_pose, "gamemap");
+  //   }
+  //   catch (tf2::TransformException &ex)
+  //   {
+  //     RCLCPP_WARN(this->get_logger(), "Transform error: %s", ex.what());
+  //     return;
+  //   }
+  //   transformed_poses.push_back(transformed_pose);
+  // }
+  // sendpacket.start_pos_x = static_cast<unsigned int>(std::round(transformed_poses.front().pose.position.x * 10));
+  // sendpacket.start_pos_y = static_cast<unsigned int> (std::round(transformed_poses.front().pose.position.y * 10));
+  // if (transformed_poses.size() > 50)
+  // {
+  //   size = 50;
+  // }
+  // else
+  // {
+  //   size = transformed_poses.size();
+  // }
+  // for(int i = 0; i < size; i++)
+  // {
+  //   sendpacket.d_x[i] = static_cast<int> (std::round(transformed_poses[i + 1].pose.position.x * 10 - transformed_poses[i].pose.position.x * 10));
+  //   sendpacket.d_y[i] = static_cast<int> (std::round(transformed_poses[i + 1].pose.position.y * 10 - transformed_poses[i].pose.position.y * 10));
+  // }
 }
 
 void RMSerialDriver::getParams()

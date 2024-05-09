@@ -44,12 +44,15 @@ struct SendPacket
 
   float nav_x;
   float nav_y;
-  float first_pos_x;
-  float first_pos_y;
-  float d_path_x[49];
-  float d_path_y[49];
 
   uint32_t sentry_cmd; // 哨兵发给裁判系统的自主决策命令，如选择复活，买弹等，见裁判系统
+
+  // uint8_t intention;    //用于哨兵的路径显示
+  // uint16_t start_pos_x;
+  // uint16_t start_pos_y;
+  // int8_t d_x[49];
+  // int8_t d_y[49];
+  // uint16_t sender_id;
 
   uint16_t checksum = 0;
 } __attribute__((packed));
