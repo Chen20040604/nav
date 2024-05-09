@@ -609,6 +609,7 @@ namespace IG_LIO
         std::shared_ptr<std::thread> localizer_thread_;
         std::shared_ptr<tf2_ros::TransformBroadcaster> br_;
         std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_br_;
+        std::chrono::time_point<std::chrono::steady_clock> init_time_;
 
         rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
         rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr local_cloud_pub_;

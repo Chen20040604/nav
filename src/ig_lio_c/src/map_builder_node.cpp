@@ -180,6 +180,7 @@ namespace IG_LIO
 
     void MapBuilderNode::init()
     {
+        init_time_ = std::chrono::steady_clock::now();
         shared_data_ = std::make_shared<SharedData>();
         br_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
         static_br_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
@@ -256,6 +257,7 @@ namespace IG_LIO
         {
             RCLCPP_WARN(this->get_logger(), "SYSTEM RESET!");
             systemReset();
+            init_time_ = std::chrono::steady_clock::now();
             shared_data_->service_mutex.lock();
             shared_data_->reset_flag = false;
             shared_data_->service_mutex.unlock();
@@ -313,6 +315,13 @@ namespace IG_LIO
                                         global_frame_,
                                         current_time_));
             }
+        }
+        if(std::chrono::steady_clock::now()-init_time_ < std::chrono::seconds(5) && (current_state_.pos.norm() > 0.1 || current_state_.rot.norm() > 2.0))
+        {
+            std::cout << current_state_.pos.norm() << " " << current_state_.rot.norm() << std::endl;
+            shared_data_->service_mutex.lock();
+            shared_data_->reset_flag = true;
+            shared_data_->service_mutex.unlock();
         }
     }
 
