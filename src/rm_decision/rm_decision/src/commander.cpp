@@ -131,6 +131,12 @@ namespace rm_decision
             std::cout << "outpose is set to false" << std::endl;
             outpose = false;}).detach();
             }
+          if(base){
+              std::thread([this] {
+                  std::this_thread::sleep_for(std::chrono::minutes(1));
+                  std::cout << "outpose is set to false" << std::endl;
+                  outpose = false;}).detach();
+          }
       }
 
    }
@@ -413,7 +419,7 @@ namespace rm_decision
    //振荡模式
    void MoveState::handle() {
        if (commander->move_points_.empty()) {
-           commander->move_points_ = commander->generateRandomPoints(10, 1);
+           commander->move_points_ = commander->generateRandomPoints(10, 0.6);
            commander->move = commander->move_points_.begin();
        }
 

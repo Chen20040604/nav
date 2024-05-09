@@ -233,7 +233,10 @@ public:
   float goldcoin;
   int buy_ammo;
   int buy_hp = 0;
-
+  bool dafu_order_goal_reached = false; //在目标模式后，达到目标点之后的标识位
+  bool outpose_order_goal_reached = false;
+  bool base_order_goal_reached = false;
+  bool defend_order_goal_reached = false;
   private:
   
   rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SharedPtr nav_to_pose_client;
@@ -271,46 +274,59 @@ public:
   //this is used for bt
 
   void mydafu_handle(){
-    std::cout << "dafu_handle is called" << std::endl;
-    goal.header.stamp = this->now();
-    goal.header.frame_id = "map";
-    goal.pose.position.x = 0; 
-    goal.pose.position.y = 0;
-    goal.pose.position.z = 0.0;
-    goal.pose.orientation.x = 0.0;
-    goal.pose.orientation.y = 0.0;
-    goal.pose.orientation.z = 0.0;
-    goal.pose.orientation.w = 1.0;
-    setState(std::make_shared<GoAndStayState>(this));
-    order = true;
+      order = true;
+      if(!dafu_order_goal_reached){
+          std::cout << "dafu_handle is called" << std::endl;
+          goal.header.stamp = this->now();
+          goal.header.frame_id = "map";
+          goal.pose.position.x = 0;
+          goal.pose.position.y = 0;
+          goal.pose.position.z = 0.0;
+          goal.pose.orientation.x = 0.0;
+          goal.pose.orientation.y = 0.0;
+          goal.pose.orientation.z = 0.0;
+          goal.pose.orientation.w = 1.0;
+          setState(std::make_shared<GoAndStayState>(this));
+          dafu_order_goal_reached = true;
+      }
+      else
+          setState(std::make_shared<MoveState>(this));
   }
     void myoutpose_handle(){
-        std::cout << "outpose_handle is called" << std::endl;
-        goal.header.stamp = this->now();
-        goal.header.frame_id = "map";
-        goal.pose.position.x = 0; 
-        goal.pose.position.y = 0;
-        goal.pose.position.z = 0.0;
-        goal.pose.orientation.x = 0.0;
-        goal.pose.orientation.y = 0.0;
-        goal.pose.orientation.z = 0.0;
-        goal.pose.orientation.w = 1.0;
-        setState(std::make_shared<GoAndStayState>(this));
         order = true;
+        if(!outpose_order_goal_reached){
+            std::cout << "outpose_handle is called" << std::endl;
+            goal.header.stamp = this->now();
+            goal.header.frame_id = "map";
+            goal.pose.position.x = 0;
+            goal.pose.position.y = 0;
+            goal.pose.position.z = 0.0;
+            goal.pose.orientation.x = 0.0;
+            goal.pose.orientation.y = 0.0;
+            goal.pose.orientation.z = 0.0;
+            goal.pose.orientation.w = 1.0;
+            setState(std::make_shared<GoAndStayState>(this));
+            outpose_order_goal_reached = true;
+        } else
+            setState(std::make_shared<MoveState>(this));
     }
     void mybase_handle(){
-        std::cout << "base_handle is called" << std::endl;
-        goal.header.stamp = this->now();
-        goal.header.frame_id = "map";
-        goal.pose.position.x = 0; 
-        goal.pose.position.y = 0;
-        goal.pose.position.z = 0.0;
-        goal.pose.orientation.x = 0.0;
-        goal.pose.orientation.y = 0.0;
-        goal.pose.orientation.z = 0.0;
-        goal.pose.orientation.w = 1.0;
-        setState(std::make_shared<GoAndStayState>(this));
         order = true;
+        if(!base_order_goal_reached){
+            std::cout << "base_handle is called" << std::endl;
+            goal.header.stamp = this->now();
+            goal.header.frame_id = "map";
+            goal.pose.position.x = 0;
+            goal.pose.position.y = 0;
+            goal.pose.position.z = 0.0;
+            goal.pose.orientation.x = 0.0;
+            goal.pose.orientation.y = 0.0;
+            goal.pose.orientation.z = 0.0;
+            goal.pose.orientation.w = 1.0;
+            setState(std::make_shared<GoAndStayState>(this));
+            base_order_goal_reached = true;
+        } else
+            setState(std::make_shared<MoveState>(this));
     }
     // 上面都是进攻的
     void myaddhp_handle(){
@@ -328,18 +344,22 @@ public:
         order = false;
     }
     void mydefend_handle(){
-        std::cout << "defend_handle is called" << std::endl;
-        goal.header.stamp = this->now();
-        goal.header.frame_id = "map";
-        goal.pose.position.x = -3; 
-        goal.pose.position.y = 3;
-        goal.pose.position.z = 0.0;
-        goal.pose.orientation.x = 0.0;
-        goal.pose.orientation.y = 0.0;
-        goal.pose.orientation.z = 0.0;
-        goal.pose.orientation.w = 1.0;
-        setState(std::make_shared<GoAndStayState>(this));
         order = true;
+        if(!defend_order_goal_reached){
+            std::cout << "defend_handle is called" << std::endl;
+            goal.header.stamp = this->now();
+            goal.header.frame_id = "map";
+            goal.pose.position.x = -3;
+            goal.pose.position.y = 3;
+            goal.pose.position.z = 0.0;
+            goal.pose.orientation.x = 0.0;
+            goal.pose.orientation.y = 0.0;
+            goal.pose.orientation.z = 0.0;
+            goal.pose.orientation.w = 1.0;
+            setState(std::make_shared<GoAndStayState>(this));}
+        else
+            setState(std::make_shared<MoveState>(this));
+
     }
     void myattack_handle(){
         std::cout << "attack_handle is called" << std::endl;
@@ -357,39 +377,58 @@ public:
     }
 
     BT::NodeStatus wait_for_start(){
-        // if (gamestart) {
-        //   return BT::NodeStatus::FAILURE;
-        // }
-        // else {
-        //   return BT::NodeStatus::SUCCESS;
-        // }
-        return BT::NodeStatus::FAILURE;
+         if (gamestart) {
+           return BT::NodeStatus::FAILURE;
+         }
+         else {
+           return BT::NodeStatus::SUCCESS;
+         }
     }
 
     BT::NodeStatus dafu_ordered(){
+      //for test
+      if(self_hp >= 390 && self_hp < 400 ){
+          dafu = true;
+      }
+
     if (dafu) {
       return BT::NodeStatus::SUCCESS;
     }
     else {
       return BT::NodeStatus::FAILURE;
+      dafu_order_goal_reached = false;
     }
     }
 
   BT::NodeStatus outpose_ordered(){
-    if (outpose) {
+
+      //for test
+      if(self_hp >= 350 && self_hp < 360 ){
+          outpose = true;
+      }
+
+      if (outpose) {
       return BT::NodeStatus::SUCCESS;
     }
     else {
       return BT::NodeStatus::FAILURE;
+      outpose_order_goal_reached = false;
     }
     }
 
   BT::NodeStatus base_ordered(){
+
+      //for test
+      if(self_hp >= 300 && self_hp < 310 ){
+          base = true;
+      }
+
     if (base) {
       return BT::NodeStatus::SUCCESS;
     }
     else {
       return BT::NodeStatus::FAILURE;
+      base_order_goal_reached = false;
     }
     }
 
@@ -400,8 +439,15 @@ public:
     // else {
     //   return BT::NodeStatus::FAILURE;
     // }
-      return BT::NodeStatus::FAILURE;
-    }
+
+    //test
+     if (self_hp <= 50 ) {
+       return BT::NodeStatus::SUCCESS;
+     }
+     else {
+       return BT::NodeStatus::FAILURE;
+     }
+  }
 
   BT::NodeStatus IfDefend(){
     // if(self_base <= 150){
@@ -409,7 +455,17 @@ public:
     // }
     // else {
     // return BT::NodeStatus::FAILURE;
-    // }
+    // defend_order_goal_reached = false;
+      // }
+
+      // test
+      if(self_hp <= 20){
+        return BT::NodeStatus::SUCCESS;
+     }
+     else {
+        return BT::NodeStatus::FAILURE;
+        defend_order_goal_reached = false;
+     }
     return BT::NodeStatus::FAILURE;
     }
 
@@ -429,68 +485,53 @@ public:
       // else {
       //     return BT::NodeStatus::FAILURE;
       // }
-      return BT::NodeStatus::FAILURE;
+      return BT::NodeStatus::SUCCESS;
     }
 
 
     BT::NodeStatus dafu_handle(){
         mydafu_handle();
-        if(nav_state == 1){
-          return BT::NodeStatus::SUCCESS;
-        }
-        else if(nav_state == 4){
+        if(nav_state == 4){
           return BT::NodeStatus::RUNNING;
         }
         else {
-          return BT::NodeStatus::FAILURE;
+          return BT::NodeStatus::SUCCESS;
         }
       }
 
     BT::NodeStatus outpose_handle(){
         myoutpose_handle();
-        if(nav_state == 1){
-            return BT::NodeStatus::SUCCESS;
-        }
-        else if(nav_state == 4){
+        if(nav_state == 4){
             return BT::NodeStatus::RUNNING;
         }
         else {
-            return BT::NodeStatus::FAILURE;
+            return BT::NodeStatus::SUCCESS;
         }
       }
 
     BT::NodeStatus base_handle(){
         mybase_handle();
-        if(nav_state == 1){
-            return BT::NodeStatus::SUCCESS;
-        }
-        else if(nav_state == 4){
+        if(nav_state == 4){
             return BT::NodeStatus::RUNNING;
         }
         else {
-            return BT::NodeStatus::FAILURE;
+            return BT::NodeStatus::SUCCESS;
         }
       }
 
     BT::NodeStatus addhp_handle(){
         myaddhp_handle();
-        if(nav_state == 1){
-            return BT::NodeStatus::SUCCESS;
-        }
-        else if(nav_state == 4){
+        if(nav_state == 4){
             return BT::NodeStatus::RUNNING;
         }
         else {
-            return BT::NodeStatus::FAILURE;
+            return BT::NodeStatus::SUCCESS;
         }
       }
 
     BT::NodeStatus defend_handle(){
         mydefend_handle();
-        if(nav_state == 1){
-            return BT::NodeStatus::SUCCESS;
-        }
-        else if(nav_state == 4){
+        if(nav_state == 4){
             return BT::NodeStatus::RUNNING;
         }
         else {
@@ -501,14 +542,11 @@ public:
 
     BT::NodeStatus attack_handle(){
         myattack_handle();
-        if(nav_state == 1){
-            return BT::NodeStatus::SUCCESS;
-        }
-        else if(nav_state == 4){
+        if(nav_state == 4){
             return BT::NodeStatus::RUNNING;
         }
         else {
-            return BT::NodeStatus::FAILURE;
+            return BT::NodeStatus::SUCCESS;
         }
       }
 
