@@ -34,17 +34,24 @@ RMSerialDriver::RMSerialDriver(const rclcpp::NodeOptions & options)
   tf_buffer_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());
   tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
   static_broadcaster = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
-
+  //gamemap下的两点坐标
   double x0 = 5.0;
   double y0 = 5.0;
   double x1 = 5.0;
   double y1 = 5.0;
+  //check 点坐标
+  double a = 5.0;
+  double b = 5.0;
+  //标定
+  double yaw = atan((y3 - y2) / (x3 - x2)) - atan((y1 - y0) / (x1 - x0));
+  double dx = x2 - x0*cos(yaw) + y0*sin(yaw);
+  double dy = y2 - x0*sin(yaw) - y0*cos(yaw);
 
   geometry_msgs::msg::TransformStamped static_transform;
   static_transform.header.frame_id = "map";
   static_transform.child_frame_id = "gamemap";
-  static_transform.transform.translation.x = x;
-  static_transform.transform.translation.y = y;
+  static_transform.transform.translation.x = dx;
+  static_transform.transform.translation.y = dy;
   static_transform.transform.translation.z = 0.0;
   tf2::Quaternion quat;
   quat.setRPY(0.0, 0.0, yaw); // Roll, Pitch, Yaw
@@ -53,6 +60,29 @@ RMSerialDriver::RMSerialDriver(const rclcpp::NodeOptions & options)
   static_transform.transform.rotation.z = quat.z();
   static_transform.transform.rotation.w = quat.w();
   static_broadcaster->sendTransform(static_transform);
+
+  // check transform
+  geometry_msgs::msg::PoseStamped pose_stamped;
+  pose_stamped.header.frame_id = "gamemap";
+  pose_stamped.pose.position.x = a;
+  pose_stamped.pose.position.y = b;
+  pose_stamped.pose.position.z = 0.0;
+  pose_stamped.pose.orientation.x = 0.0;
+  pose_stamped.pose.orientation.y = 0.0;
+  pose_stamped.pose.orientation.z = 0.0;
+  pose_stamped.pose.orientation.w = 1.0;
+  geometry_msgs::msg::PoseStamped check_pose;
+  try
+  {
+    tf_buffer_->transform(pose_stamped, check_pose, "map");
+  }
+  catch (tf2::TransformException & ex)
+  {
+    RCLCPP_WARN(this->get_logger(), "Transform error: %s", ex.what());
+    return;
+  }
+  double error_dis = sqrt(pow(check_pose.pose.position.x - a1, 2) + pow(check_pose.pose.position.y - b1, 2));
+  RCLCPP_INFO(this->get_logger(), "Transform error: %f", error_dis);
 
   // Create Publisher
   to_decision_pub_ = this->create_publisher<rm_decision_interfaces::msg::FromSerial>("fromjudge", 10);
@@ -273,7 +303,7 @@ void RMSerialDriver::decisionSendData(const rm_decision_interfaces::msg::ToSeria
 void RMSerialDriver::pathSendData(const nav_msgs::msg::Path::SharedPtr msg)
 {
   std::vector<geometry_msgs::msg::PoseStamped> transformed_poses;
-  int size = 50;
+  // int size = 50;
   // sendpacket.intention = 3;
   // sendpacket.sender_id = 0;
   // // 转换每个位姿
@@ -321,9 +351,12 @@ void RMSerialDriver::getParams()
   auto pt = Parity::NONE;
   auto sb = StopBits::ONE;
 
-  x = declare_parameter<float>("x", 0.0);
-  y = declare_parameter<float>("y", 0.0);
-  yaw = declare_parameter<float>("yaw", 0.0);
+  x2 = declare_parameter<float>("x2", 0.0);
+  y2 = declare_parameter<float>("y2", 0.0);
+  x3 = declare_parameter<float>("x3", 0.0);
+  y3 = declare_parameter<float>("y4", 0.0);
+  a1 = declare_parameter<float>("a1", 0.0);
+  b1 = declare_parameter<float>("b1", 0.0);
 
   try {
     device_name_ = declare_parameter<std::string>("device_name", "");

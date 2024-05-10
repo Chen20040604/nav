@@ -74,9 +74,12 @@ private:
   std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
-  float x = 0.0;
-  float y = 0.0;
-  float yaw = 0.0;
+  float x2 = 0.0;
+  float y2 = 0.0;
+  float x3 = 0.0;
+  float y3 = 0.0;
+  float a1 = 0.0;
+  float b1 = 0.0;
 
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr nav_sub_;
   rclcpp::Subscription<rm_decision_interfaces::msg::ToSerial>::SharedPtr from_decision_sub_;
