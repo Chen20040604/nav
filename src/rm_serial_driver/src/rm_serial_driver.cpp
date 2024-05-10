@@ -212,6 +212,30 @@ void RMSerialDriver::receiveData()
                         msg.blue_outpost_hp = packet.blue_outpost_HP;
                         msg.blue_base_hp = packet.blue_base_HP;
 
+                        // //transfrom to map
+                        // geometry_msgs::msg::PoseStamped pose_stamped;
+                        // pose_stamped.header.frame_id = "gamemap";
+                        // pose_stamped.pose.position.x = packet.target_pos_x;
+                        // pose_stamped.pose.position.y = packet.target_pos_y;
+                        // pose_stamped.pose.position.z = 0.0;
+                        // pose_stamped.pose.orientation.x = 0.0;
+                        // pose_stamped.pose.orientation.y = 0.0;
+                        // pose_stamped.pose.orientation.z = 0.0;
+                        // pose_stamped.pose.orientation.w = 1.0;
+                        // geometry_msgs::msg::PoseStamped goal_pose;
+                        // try
+                        // {
+                        //   tf_buffer_->transform(pose_stamped, goal_pose, "map");
+                        // }
+                        // catch (tf2::TransformException &ex)
+                        // {
+                        //   RCLCPP_WARN(this->get_logger(), "Transform error: %s", ex.what());
+                        //   return;
+                        // }
+                        // msg.target_pos_x = goal_pose.pose.position.x;
+                        // msg.target_pos_y = goal_pose.pose.position.y;
+                        // msg.cmd_key = packet.cmd_key;
+
                       //std::cout<< "received from serial successfully "<< std::endl;
                       //std::cout<< packet.remaining_gold_coin<< std::endl;
                       to_decision_pub_->publish(msg);

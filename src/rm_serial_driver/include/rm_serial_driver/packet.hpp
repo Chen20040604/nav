@@ -32,6 +32,9 @@ struct ReceivePacket
   uint16_t blue_outpost_HP;  
   uint16_t blue_base_HP;
   
+  // float target_pos_x;  //目标位置
+  // float target_pos_y;
+  // uint8_t cmd_key;
   uint16_t checksum = 0;     // crc16校验位 
 } __attribute__((packed));
 
