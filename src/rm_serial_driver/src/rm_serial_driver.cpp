@@ -114,10 +114,15 @@ void RMSerialDriver::receiveData()
 
           if (receiving_data) {
               // 如果正在接收数据，将数据添加到缓冲区
+
+              RCLCPP_INFO(this->get_logger(), "now receiveing");
+
               data_buffer.push_back(header[0]);
               // std::cout << "header[0]" << static_cast<int>(header[0]) << std::endl;
               if (header[0] == 0xAA) {
                   // 如果检测到结束标识符（0xAA），则停止接收数据并处理
+                  RCLCPP_INFO(this->get_logger(), "finished receiveing");
+
                   receiving_data = false;
                   // for(int i = 0; i < static_cast<int>(data_buffer.size()); i++)
                   // {
@@ -161,6 +166,9 @@ void RMSerialDriver::receiveData()
                       //std::cout<< packet.remaining_gold_coin<< std::endl;
                       to_decision_pub_->publish(msg);
                       receive_flag = false;
+                      
+                      RCLCPP_INFO(this->get_logger(), "自身金币: %d color: %d, gamestart: %d",msg.remaining_gold_coin,msg.color,msg.gamestart);
+
                       }
                       else
                       {
@@ -198,6 +206,7 @@ void RMSerialDriver::sendData()
     }
     else{
       try {
+        RCLCPP_INFO(this->get_logger(), "trying to send data");
         uint16_t CRC_check = 0x0000;
         uint16_t CRC16_init = 0xFFFF;
         //sendpacket.nav_x = 1000;
@@ -231,7 +240,7 @@ void RMSerialDriver::navSendData(const geometry_msgs::msg::Twist& cmd_vel)
     sendpacket.naving = true;
     sendpacket.nav_x = -cmd_vel.linear.y*6000;
     sendpacket.nav_y = cmd_vel.linear.x*6000;
-    std::cout << sendpacket.nav_x << sendpacket.nav_y <<std::endl;
+    // std::cout << sendpacket.nav_x << sendpacket.nav_y <<std::endl;
     
     //crc16::Append_CRC16_Check_Sum(reinterpret_cast<uint8_t *>(&sendpacket), sizeof(sendpacket));
 

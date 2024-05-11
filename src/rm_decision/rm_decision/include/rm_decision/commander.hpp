@@ -279,8 +279,8 @@ public:
           std::cout << "dafu_handle is called" << std::endl;
           goal.header.stamp = this->now();
           goal.header.frame_id = "map";
-          goal.pose.position.x = 0;
-          goal.pose.position.y = 0;
+          goal.pose.position.x = -1.86;
+          goal.pose.position.y = 2.54;
           goal.pose.position.z = 0.0;
           goal.pose.orientation.x = 0.0;
           goal.pose.orientation.y = 0.0;
@@ -298,8 +298,8 @@ public:
             std::cout << "outpose_handle is called" << std::endl;
             goal.header.stamp = this->now();
             goal.header.frame_id = "map";
-            goal.pose.position.x = 0;
-            goal.pose.position.y = 0;
+            goal.pose.position.x = -1.67;
+            goal.pose.position.y = 1.82;
             goal.pose.position.z = 0.0;
             goal.pose.orientation.x = 0.0;
             goal.pose.orientation.y = 0.0;
@@ -316,8 +316,8 @@ public:
             std::cout << "base_handle is called" << std::endl;
             goal.header.stamp = this->now();
             goal.header.frame_id = "map";
-            goal.pose.position.x = 0;
-            goal.pose.position.y = 0;
+            goal.pose.position.x = -2.35;
+            goal.pose.position.y = 1.18;
             goal.pose.position.z = 0.0;
             goal.pose.orientation.x = 0.0;
             goal.pose.orientation.y = 0.0;
@@ -377,12 +377,15 @@ public:
     }
 
     BT::NodeStatus wait_for_start(){
-         if (gamestart) {
-           return BT::NodeStatus::FAILURE;
-         }
-         else {
-           return BT::NodeStatus::SUCCESS;
-         }
+        //  if (gamestart) {
+        //    return BT::NodeStatus::FAILURE;
+        //  }
+        //  else {
+        //    return BT::NodeStatus::SUCCESS;
+        //  }
+
+        return BT::NodeStatus::SUCCESS;
+
     }
 
     BT::NodeStatus dafu_ordered(){
@@ -403,7 +406,7 @@ public:
   BT::NodeStatus outpose_ordered(){
 
       //for test
-      if(self_hp >= 350 && self_hp < 360 ){
+      if(self_hp >= 370 && self_hp < 380 ){
           outpose = true;
       }
 
@@ -419,7 +422,7 @@ public:
   BT::NodeStatus base_ordered(){
 
       //for test
-      if(self_hp >= 300 && self_hp < 310 ){
+      if(self_hp >= 350 && self_hp < 360 ){
           base = true;
       }
 
@@ -441,7 +444,7 @@ public:
     // }
 
     //test
-     if (self_hp <= 50 ) {
+     if (self_hp >= 330 && self_hp < 340) {
        return BT::NodeStatus::SUCCESS;
      }
      else {
@@ -459,7 +462,7 @@ public:
       // }
 
       // test
-      if(self_hp <= 20){
+      if(self_hp <= 1){
         return BT::NodeStatus::SUCCESS;
      }
      else {
@@ -491,62 +494,62 @@ public:
 
     BT::NodeStatus dafu_handle(){
         mydafu_handle();
-        if(nav_state == 4){
-          return BT::NodeStatus::RUNNING;
+        if(nav_state == 1){
+          return BT::NodeStatus::SUCCESS;
         }
         else {
-          return BT::NodeStatus::SUCCESS;
+          return BT::NodeStatus::RUNNING;
         }
       }
 
     BT::NodeStatus outpose_handle(){
         myoutpose_handle();
-        if(nav_state == 4){
-            return BT::NodeStatus::RUNNING;
+        if(nav_state == 1){
+            return BT::NodeStatus::SUCCESS;
         }
         else {
-            return BT::NodeStatus::SUCCESS;
+            return BT::NodeStatus::RUNNING;
         }
       }
 
     BT::NodeStatus base_handle(){
         mybase_handle();
-        if(nav_state == 4){
-            return BT::NodeStatus::RUNNING;
+        if(nav_state == 1){
+            return BT::NodeStatus::SUCCESS;
         }
         else {
-            return BT::NodeStatus::SUCCESS;
+            return BT::NodeStatus::RUNNING;
         }
       }
 
     BT::NodeStatus addhp_handle(){
         myaddhp_handle();
-        if(nav_state == 4){
-            return BT::NodeStatus::RUNNING;
+        if(nav_state == 1){
+            return BT::NodeStatus::SUCCESS;
         }
         else {
-            return BT::NodeStatus::SUCCESS;
+            return BT::NodeStatus::RUNNING;
         }
       }
 
     BT::NodeStatus defend_handle(){
         mydefend_handle();
-        if(nav_state == 4){
-            return BT::NodeStatus::RUNNING;
+        if(nav_state == 1){
+            return BT::NodeStatus::SUCCESS;
         }
         else {
             // return BT::NodeStatus::FAILURE;
-            return BT::NodeStatus::SUCCESS;
+            return BT::NodeStatus::RUNNING;
         }
       }
 
     BT::NodeStatus attack_handle(){
         myattack_handle();
-        if(nav_state == 4){
-            return BT::NodeStatus::RUNNING;
+        if(nav_state == 1){
+            return BT::NodeStatus::SUCCESS;
         }
         else {
-            return BT::NodeStatus::SUCCESS;
+            return BT::NodeStatus::RUNNING;
         }
       }
 
