@@ -32,6 +32,9 @@ struct ReceivePacket
   uint16_t blue_outpost_HP;  
   uint16_t blue_base_HP;
   
+  // float target_pos_x;  //目标位置
+  // float target_pos_y;
+  // uint8_t cmd_key;
   uint16_t checksum = 0;     // crc16校验位 
 } __attribute__((packed));
 
@@ -44,8 +47,16 @@ struct SendPacket
 
   float nav_x;
   float nav_y;
-  uint32_t sentry_cmd;  //哨兵发给裁判系统的自主决策命令，如选择复活，买弹等，见裁判系统
-    
+
+  uint32_t sentry_cmd; // 哨兵发给裁判系统的自主决策命令，如选择复活，买弹等，见裁判系统
+
+  // uint8_t intention;    //用于哨兵的路径显示
+  // uint16_t start_pos_x;
+  // uint16_t start_pos_y;
+  // int8_t d_x[49];
+  // int8_t d_y[49];
+  // uint16_t sender_id;
+
   uint16_t checksum = 0;
 } __attribute__((packed));
 

@@ -14,3 +14,7 @@ uint16 red_base_hp
 uint16 blue_7
 uint16 blue_outpost_hp
 uint16 blue_base_hp
+
+float32 target_pos_x
+float32 target_pos_y
+uint8 cmd_key
