@@ -388,6 +388,10 @@ public:
 
     }
 
+    BT::NodeStatus IfAsked(){
+      return BT::NodeStatus::SUCCESS;
+    }
+
     BT::NodeStatus dafu_ordered(){
       //for test
       if(self_hp >= 390 && self_hp < 400 ){
@@ -491,6 +495,23 @@ public:
       return BT::NodeStatus::SUCCESS;
     }
 
+    BT::NodeStatus IfBuyToRelive(){
+        return  BT::NodeStatus::SUCCESS;
+    }
+
+    BT::NodeStatus IfBuyAmmoRemotely(){
+        return  BT::NodeStatus::SUCCESS;
+    }
+    BT::NodeStatus IfBuyHp(){
+        return  BT::NodeStatus::SUCCESS;
+    }
+
+
+    BT::NodeStatus Gimbal_handle(){
+        return  BT::NodeStatus::SUCCESS;
+   }
+
+
 
     BT::NodeStatus dafu_handle(){
         mydafu_handle();
@@ -562,6 +583,19 @@ public:
         myMoveAround_handle();
         return BT::NodeStatus::SUCCESS;
       }
+
+    BT::NodeStatus BuyToRelive_handle(){
+      return BT::NodeStatus::SUCCESS;
+    }
+
+    BT::NodeStatus BuyAmmoRemotely_handle(){
+        return BT::NodeStatus::SUCCESS;
+    }
+
+    BT::NodeStatus BuyHp_handle(){
+        return BT::NodeStatus::SUCCESS;
+    }
+
 
   //above is used for bt
 };

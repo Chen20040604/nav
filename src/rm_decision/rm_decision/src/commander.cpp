@@ -101,6 +101,10 @@ namespace rm_decision
         factory.registerSimpleCondition("IfDefend", std::bind(&Commander::IfDefend, this));
         factory.registerSimpleCondition("IfAttack", std::bind(&Commander::IfAttack, this));
         factory.registerSimpleCondition("IfGuard", std::bind(&Commander::IfGuard, this));
+        factory.registerSimpleCondition("IfAsked", std::bind(&Commander::IfAsked, this));
+        factory.registerSimpleCondition("IfBuyToRelive", std::bind(&Commander::IfBuyToRelive, this));
+        factory.registerSimpleCondition("IfBuyAmmoRemotely", std::bind(&Commander::IfBuyAmmoRemotely, this));
+        factory.registerSimpleCondition("IfBuyHp", std::bind(&Commander::IfBuyHp, this));
 
         factory.registerSimpleAction("dafu_handle", std::bind(&Commander::dafu_handle, this));
         factory.registerSimpleAction("outpose_handle", std::bind(&Commander::outpose_handle, this));
@@ -111,6 +115,10 @@ namespace rm_decision
         factory.registerSimpleAction("Guard", std::bind(&Commander::Guard_handle, this));
         factory.registerSimpleAction("MoveAround", std::bind(&Commander::MoveAround_handle, this));
 
+        factory.registerSimpleAction("Gimbal_handle", std::bind(&Commander::Gimbal_handle, this));
+        factory.registerSimpleAction("BuyToRelive_handle", std::bind(&Commander::BuyToRelive_handle, this));
+        factory.registerSimpleAction("BuyAmmoRemotely_handle", std::bind(&Commander::BuyAmmoRemotely_handle, this));
+        factory.registerSimpleAction("BuyHp_handle", std::bind(&Commander::BuyHp_handle, this));
       auto tree = factory.createTreeFromFile("./src/rm_decision/rm_decision/config/sentry_bt.xml"); //official
       // auto tree = factory.createTreeFromFile("./rm_decision/config/sentry_bt.xml");  //for debug
       BT::Groot2Publisher publisher(tree);
