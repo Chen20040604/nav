@@ -2,47 +2,84 @@
 <root BTCPP_format="4"
       main_tree_to_execute="main">
   <BehaviorTree ID="main">
-    <Fallback>
-      <wait_for_start/>
-      <Sequence>
-        <dafu_ordered/>
-        <dafu_handle/>
-      </Sequence>
-      <Sequence>
-        <outpose_ordered/>
-        <outpose_handle/>
-      </Sequence>
-      <Sequence>
-        <base_ordered/>
-        <base_handle/>
-      </Sequence>
-      <Sequence>
-        <IfAddHp/>
-        <addhp_handle/>
-      </Sequence>
-      <Sequence>
-        <IfDefend/>
-        <defend_handle/>
-      </Sequence>
-      <Sequence>
-        <IfAttack/>
-        <attack_handle/>
-      </Sequence>
-      <Sequence>
-        <IfGuard/>
-        <Guard/>
-      </Sequence>
-      <MoveAround/>
-    </Fallback>
+    <Sequence>
+      <Fallback>
+        <wait_for_start/>
+        <Sequence>
+          <IfAsked/>
+          <Gimbal_handle/>
+        </Sequence>
+        <Sequence>
+          <dafu_ordered/>
+          <dafu_handle/>
+        </Sequence>
+        <Sequence>
+          <outpose_ordered/>
+          <outpose_handle/>
+        </Sequence>
+        <Sequence>
+          <base_ordered/>
+          <base_handle/>
+        </Sequence>
+        <Sequence>
+          <IfAddHp/>
+          <addhp_handle/>
+        </Sequence>
+        <Sequence>
+          <IfDefend/>
+          <defend_handle/>
+        </Sequence>
+        <Sequence>
+          <IfAttack/>
+          <attack_handle/>
+        </Sequence>
+        <Sequence>
+          <IfGuard/>
+          <Guard/>
+        </Sequence>
+        <MoveAround/>
+      </Fallback>
+      <Fallback>
+        <Sequence>
+          <IfBuyToRelive/>
+          <BuyToRelive_handle/>
+        </Sequence>
+        <Sequence>
+          <IfBuyAmmoRemotely/>
+          <BuyAmmoRemotely_handle/>
+        </Sequence>
+        <Sequence>
+          <IfBuyHp/>
+          <BuyHp_handle/>
+        </Sequence>
+        <AlwaysSuccess/>
+      </Fallback>
+    </Sequence>
   </BehaviorTree>
 
   <!-- Description of Node Models (used by Groot) -->
   <TreeNodesModel>
+    <Action ID="BuyAmmoRemotely_handle"
+            editable="true"/>
+    <Action ID="BuyHp_handle"
+            editable="true"/>
+    <Action ID="BuyToRelive_handle"
+            editable="true"/>
+    <Action ID="Gimbal_handle"
+            editable="true"/>
     <Action ID="Guard"
             editable="true"/>
     <Condition ID="IfAddHp"
                editable="true"/>
+    <Condition ID="IfAsked"
+               editable="true"/>
     <Condition ID="IfAttack"
+               editable="true"/>
+    <Condition ID="IfBuyAmmoRemotely"
+               editable="true"/>
+    <Condition ID="IfBuyHp"
+               editable="true"/>
+    <Condition ID="IfBuyToRelive"
                editable="true"/>
     <Condition ID="IfDefend"
                editable="true"/>

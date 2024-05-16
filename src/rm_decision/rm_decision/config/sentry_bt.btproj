@@ -3,14 +3,20 @@
     <include path="sentry_bt.xml"/>
     <!-- Description of Node Models (used by Groot) -->
     <TreeNodesModel>
+        <Action ID="BuyAmmoRemotely_handle" editable="true"/>
+        <Action ID="BuyHp_handle" editable="true"/>
+        <Action ID="BuyToRelive_handle" editable="true"/>
+        <Action ID="Gimbal_handle" editable="true"/>
         <Action ID="Guard" editable="true"/>
         <Condition ID="IfAddHp" editable="true"/>
-        <Condition ID="IfAddHpConditionOk" editable="true"/>
+        <Condition ID="IfAsked" editable="true"/>
         <Condition ID="IfAttack" editable="true"/>
+        <Condition ID="IfBuyAmmo" editable="true"/>
+        <Condition ID="IfBuyAmmoRemotely" editable="true"/>
+        <Condition ID="IfBuyHp" editable="true"/>
+        <Condition ID="IfBuyToRelive" editable="true"/>
         <Condition ID="IfDefend" editable="true"/>
         <Condition ID="IfGuard" editable="true"/>
-        <Condition ID="IfHighHp" editable="true"/>
-        <Condition ID="IfOrdered" editable="true"/>
         <Action ID="MoveAround" editable="true"/>
         <Action ID="addhp_handle" editable="true"/>
         <Action ID="attack_handle" editable="true"/>
@@ -19,7 +25,9 @@
         <Action ID="dafu_handle" editable="true"/>
         <Condition ID="dafu_ordered" editable="true"/>
         <Action ID="defend_handle" editable="true"/>
+        <Condition ID="ifrelive" editable="true"/>
         <Action ID="outpose_handle" editable="true"/>
         <Condition ID="outpose_ordered" editable="true"/>
+        <Condition ID="wait_for_start" editable="true"/>
     </TreeNodesModel>
 </root>
