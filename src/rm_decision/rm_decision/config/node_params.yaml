@@ -1,5 +1,6 @@
 /rm_decision_node:
   ros__parameters:
+    strategy: 2
     route1: [-0.5, 1.6, 0.0,
               -0.5, 2.4, 0.0,
              -1.0, 2.4, 0.0]

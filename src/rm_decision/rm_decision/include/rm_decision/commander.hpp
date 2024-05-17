@@ -237,6 +237,7 @@ public:
   bool outpose_order_goal_reached = false;
   bool base_order_goal_reached = false;
   bool defend_order_goal_reached = false;
+  int strategy;
   private:
   
   rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SharedPtr nav_to_pose_client;

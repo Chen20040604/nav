@@ -55,6 +55,10 @@ namespace rm_decision
       tf2_buffer_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());
       tf2_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf2_buffer_);
       sleep(10);
+      //初始化策略 默认是1号策略
+      this->declare_parameter<int>("strategy", 1);
+      this->get_parameter("strategy", strategy);
+
       RCLCPP_INFO(this->get_logger(), "开始");
       currentState = std::make_shared<WaitState>(this);
 
