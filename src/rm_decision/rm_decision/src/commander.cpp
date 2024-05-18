@@ -157,7 +157,8 @@ namespace rm_decision
       {  
          getcurrentpose();
          currentState->handle();
-         RCLCPP_INFO(this->get_logger(), "time: %lf",time);
+         checkpo();
+         RCLCPP_INFO(this->get_logger(), "time: %lf", time);
          r.sleep();
       }
    }
@@ -177,6 +178,8 @@ namespace rm_decision
          if(self_hp == 0 && goldcoin > 200){
             msg.sentry_cmd |= (1 << 30);
          }
+         msg.shangpo = shangpo;
+         msg.diff_yaw = diffyaw;
          // if(self_ammo < 50 && goldcoin > 500){
          //    buy_ammo = 200;
          //    for (int i = 2; i <= 12; ++i) {
@@ -213,7 +216,11 @@ namespace rm_decision
 
    // 改变状态
    void Commander::setState(std::shared_ptr<State> state) {
-      currentState = state;
+      if (currentState != state){
+         move_points_.clear();
+      }
+         currentState = state;
+
    }
    
    
@@ -293,8 +300,10 @@ namespace rm_decision
       RCLCPP_INFO(this->get_logger(), "开始传入导航点");
       geometry_msgs::msg::PoseStamped pose;
       std::vector<double> pose_list;
-      std::vector<std::string> route_list = {"route1","route2","route3","route4"};
+      std::vector<std::string> route_list = {"route1", "route2", "route3", "route4"};
+      std::vector<std::string> area_list = {"po_area1", "po_area2", "po_area3"};
       std::vector<std::vector<geometry_msgs::msg::PoseStamped>>::iterator list = list_name.begin();
+      std::vector<std::vector<geometry_msgs::msg::PoseStamped>>::iterator area = po_name.begin();
       this->declare_parameter("home_pose", pose_list);
       //如果战术要求可以读取多条路径
       home.header.frame_id ="map";
@@ -309,12 +318,32 @@ namespace rm_decision
          RCLCPP_INFO(this->get_logger(), "%s随机导航点个数: %ld",it->c_str(),(*list).size());
          list ++;
       }
+      for (auto it = area_list.begin(); it != area_list.end(); it++)
+      {
+         this->declare_parameter(*it, area_list);
+         auto pose_param = this->get_parameter(*it).as_double_array();
+         processPoses(pose_param, *area);
+         RCLCPP_INFO(this->get_logger(), "%s随机导航点个数: %ld", it->c_str(), (*area).size());
+         area ++;
+      }
       Patrol_points_ = list_name.at(0);
       random = Patrol_points_.begin();
       Route3_points_ = list_name.at(2);
       attack = Route3_points_.begin();
       move = Route2_points_.begin();
       
+   }
+   void Commander::checkpo(){
+      std::vector<std::vector<geometry_msgs::msg::PoseStamped>>::iterator area;
+      for ( uint i = 0; i != po_name.size(); i ++){
+         if(isinpo(po_name[i],currentpose)){
+            shangpo = true;
+            diffyaw = getyawdiff(po_name[i][0],po_name[i][1]);
+         }
+         else{
+            shangpo = false;
+         }
+      }
    }
    // 加载敌军hp
    uint Commander::enemyhp() {
@@ -386,6 +415,25 @@ namespace rm_decision
     double Commander::distence(const geometry_msgs::msg::PoseStamped a){
         double dis = sqrt(pow(a.pose.position.x , 2) + pow(a.pose.position.y, 2));
         return dis;
+    }
+
+    bool Commander::isinpo(std::vector<geometry_msgs::msg::PoseStamped> area, geometry_msgs::msg::PoseStamped goal){
+         uint i, j;
+         bool c = false;
+         for (i = 0, j = area.size() - 1; i < area.size(); j = i++)
+         {
+            if (((area[i].pose.position.y > goal.pose.position.y) != (area[j].pose.position.y > goal.pose.position.y)) &&
+               (goal.pose.position.x < (area[j].pose.position.x - area[i].pose.position.x) * (goal.pose.position.y - area[i].pose.position.y) / (area[j].pose.position.y - area[i].pose.position.y) + area[i].pose.position.x))
+               c = !c;
+         }
+         return c;
+    }
+
+    float Commander::getyawdiff(geometry_msgs::msg::PoseStamped a, geometry_msgs::msg::PoseStamped b){
+       float diffyaw, goalyaw;
+       goalyaw = atan((b.pose.position.y - a.pose.position.y)/(b.pose.position.x - a.pose.position.x));
+       diffyaw = goalyaw - currentpose.pose.orientation.z;
+       return diffyaw;
     }
 
     void Commander::laserScanCallback(const sensor_msgs::msg::LaserScan::SharedPtr scan){

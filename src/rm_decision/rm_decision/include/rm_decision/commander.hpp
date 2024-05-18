@@ -164,6 +164,10 @@ public:
 
   void getcurrentpose();
 
+  bool isinpo(std::vector<geometry_msgs::msg::PoseStamped> area, geometry_msgs::msg::PoseStamped goal);
+
+  float getyawdiff(geometry_msgs::msg::PoseStamped a, geometry_msgs::msg::PoseStamped b);
+
   std::vector<geometry_msgs::msg::PoseStamped> generateRandomPoints(int num_points, double radius) ;
 
   // double timer();
@@ -174,16 +178,20 @@ public:
   std::vector<geometry_msgs::msg::PoseStamped> Route1_points_;
   std::vector<geometry_msgs::msg::PoseStamped> Route2_points_;
   std::vector<geometry_msgs::msg::PoseStamped> Route3_points_;
+  std::vector<geometry_msgs::msg::PoseStamped> po_area1;
+  std::vector<geometry_msgs::msg::PoseStamped> po_area2;
+  std::vector<geometry_msgs::msg::PoseStamped> po_area3;
   std::vector<geometry_msgs::msg::PoseStamped> move_points_;
-  std::vector<std::vector<geometry_msgs::msg::PoseStamped>> list_name = {Route1_points_,Route2_points_,Route3_points_};
-  
+  std::vector<std::vector<geometry_msgs::msg::PoseStamped>> po_name = {po_area1, po_area2, po_area3};
+  std::vector<std::vector<geometry_msgs::msg::PoseStamped>> list_name = {Route1_points_, Route2_points_, Route3_points_};
   std::vector<geometry_msgs::msg::PoseStamped>::iterator random;
   std::vector<geometry_msgs::msg::PoseStamped>::iterator attack;
   std::vector<geometry_msgs::msg::PoseStamped>::iterator move;
   geometry_msgs::msg::PoseStamped goal;
   geometry_msgs::msg::PoseStamped home;
   std::shared_future<rclcpp_action::ClientGoalHandle<nav2_msgs::action::NavigateToPose>::SharedPtr> send_goal_future;
-
+  float diffyaw = 0.0 ;
+  bool shangpo = false;
   bool checkgoal = true;
   bool first_start = false;
   bool control = false;
@@ -246,6 +254,7 @@ public:
   void self_cmd();
   void setState(std::shared_ptr<State> state);
   void loadNavPoints();
+  void checkpo();
   void aim_callback(const auto_aim_interfaces::msg::Target::SharedPtr msg);
   void serial_callback(const rm_decision_interfaces::msg::FromSerial::SharedPtr msg);
   void enemypose_callback(const geometry_msgs::msg::PointStamped::SharedPtr msg);
@@ -331,15 +340,8 @@ public:
     // 上面都是进攻的
     void myaddhp_handle(){
         std::cout << "addhp_handle is called" << std::endl;
-        goal.header.stamp = this->now();
-        goal.header.frame_id = "map";
-        goal.pose.position.x = -1.5; 
-        goal.pose.position.y = 2;
-        goal.pose.position.z = 0.0;
-        goal.pose.orientation.x = 0.0;
-        goal.pose.orientation.y = 0.0;
-        goal.pose.orientation.z = 0.0;
-        goal.pose.orientation.w = 1.0;
+        Patrol_points_ = list_name.at(1);
+        random = Patrol_points_.begin();
         setState(std::make_shared<GoAndStayState>(this));
         order = false;
     }
@@ -377,27 +379,19 @@ public:
     }
 
     BT::NodeStatus wait_for_start(){
-        //  if (gamestart) {
-        //    return BT::NodeStatus::FAILURE;
-        //  }
-        //  else {
-        //    return BT::NodeStatus::SUCCESS;
-        //  }
-
-        return BT::NodeStatus::SUCCESS;
-
+         if (gamestart) {
+           return BT::NodeStatus::FAILURE;
+         }
+         else {
+           return BT::NodeStatus::SUCCESS;
+         }
     }
 
     BT::NodeStatus IfAsked(){
-      return BT::NodeStatus::SUCCESS;
+      return BT::NodeStatus::FAILURE;
     }
 
     BT::NodeStatus dafu_ordered(){
-      //for test
-      if(self_hp >= 390 && self_hp < 400 ){
-          dafu = true;
-      }
-
     if (dafu) {
       return BT::NodeStatus::SUCCESS;
     }
@@ -408,12 +402,6 @@ public:
     }
 
   BT::NodeStatus outpose_ordered(){
-
-      //for test
-      if(self_hp >= 370 && self_hp < 380 ){
-          outpose = true;
-      }
-
       if (outpose) {
       return BT::NodeStatus::SUCCESS;
     }
@@ -425,11 +413,6 @@ public:
 
   BT::NodeStatus base_ordered(){
 
-      //for test
-      if(self_hp >= 350 && self_hp < 360 ){
-          base = true;
-      }
-
     if (base) {
       return BT::NodeStatus::SUCCESS;
     }
@@ -440,20 +423,12 @@ public:
     }
 
   BT::NodeStatus IfAddHp(){
-    // if (self_hp <= 150 || self_ammo < 50) {
-    //   return BT::NodeStatus::SUCCESS;
-    // }
-    // else {
-    //   return BT::NodeStatus::FAILURE;
-    // }
-
-    //test
-     if (self_hp >= 330 && self_hp < 340) {
-       return BT::NodeStatus::SUCCESS;
-     }
-     else {
-       return BT::NodeStatus::FAILURE;
-     }
+    if (self_hp <= 150 ) {
+      return BT::NodeStatus::SUCCESS;
+    }
+    else {
+      return BT::NodeStatus::FAILURE;
+    }
   }
 
   BT::NodeStatus IfDefend(){
@@ -463,16 +438,8 @@ public:
     // else {
     // return BT::NodeStatus::FAILURE;
     // defend_order_goal_reached = false;
-      // }
+    //   }
 
-      // test
-      if(self_hp <= 1){
-        return BT::NodeStatus::SUCCESS;
-     }
-     else {
-        return BT::NodeStatus::FAILURE;
-        defend_order_goal_reached = false;
-     }
     return BT::NodeStatus::FAILURE;
     }
 

@@ -329,6 +329,8 @@ void RMSerialDriver::decisionSendData(const rm_decision_interfaces::msg::ToSeria
 {
     sendpacket.header = 0xA5;
     sendpacket.sentry_cmd = msg->sentry_cmd;
+    sendpacket.diff_yaw = msg->diff_yaw;
+    sendpacket.shangpo = msg->shangpo;
     
     //crc16::Append_CRC16_Check_Sum(reinterpret_cast<uint8_t *>(&packet), sizeof(packet));
 }
