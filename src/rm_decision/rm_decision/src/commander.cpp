@@ -335,17 +335,21 @@ namespace rm_decision
    }
    void Commander::checkpo(){
       std::vector<std::vector<geometry_msgs::msg::PoseStamped>>::iterator area;
-      for ( uint i = 0; i != po_name.size(); i ++){
+      uint i = 0;
+      for ( i = 0; i != po_name.size(); i ++){
          if(isinpo(po_name[i],currentpose)){
             shangpo = true;
             diffyaw = getyawdiff(po_name[i][0],po_name[i][1]);
             RCLCPP_INFO(this->get_logger(), "在坡 diffyaw=%f", diffyaw);
-         }
-         else{
-            shangpo = false;
+            break;
          }
       }
-   }
+         if(i == po_name.size()){
+            shangpo = false;
+            diffyaw = 0;
+            RCLCPP_INFO(this->get_logger(), "no po");
+         }
+      }
    // 加载敌军hp
    uint Commander::enemyhp() {
       switch (enemy_num) {
@@ -433,8 +437,9 @@ namespace rm_decision
     float Commander::getyawdiff(geometry_msgs::msg::PoseStamped a, geometry_msgs::msg::PoseStamped b){
        float diffyaw, goalyaw;
        goalyaw = atan((b.pose.position.y - a.pose.position.y)/(b.pose.position.x - a.pose.position.x));
-       diffyaw = (goalyaw - currentpose.pose.orientation.z)*(180.0/M_PI);
-       diffyaw = fmod(diffyaw + 360, 360) - 180;
+       RCLCPP_INFO(this->get_logger(), "goal%f cur %f", goalyaw,currentpose.pose.orientation.z);
+       diffyaw = (goalyaw - currentpose.pose.orientation.z*M_PI)*(180.0/M_PI);
+       diffyaw = fmod(diffyaw + 180, 360) - 180;
        return diffyaw;
     }
 

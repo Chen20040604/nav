@@ -170,13 +170,13 @@ void RMSerialDriver::receiveData()
           if (receiving_data) {
               // 如果正在接收数据，将数据添加到缓冲区
 
-              RCLCPP_INFO(this->get_logger(), "now receiveing");
+              //RCLCPP_INFO(this->get_logger(), "now receiveing");
 
               data_buffer.push_back(header[0]);
               // std::cout << "header[0]" << static_cast<int>(header[0]) << std::endl;
               if (header[0] == 0xAA) {
                   // 如果检测到结束标识符（0xAA），则停止接收数据并处理
-                  RCLCPP_INFO(this->get_logger(), "finished receiveing");
+                  //RCLCPP_INFO(this->get_logger(), "finished receiveing");
 
                   receiving_data = false;
                   // for(int i = 0; i < static_cast<int>(data_buffer.size()); i++)
@@ -246,7 +246,7 @@ void RMSerialDriver::receiveData()
                       to_decision_pub_->publish(msg);
                       receive_flag = false;
                       
-                      RCLCPP_INFO(this->get_logger(), "自身金币: %d color: %d, gamestart: %d",msg.remaining_gold_coin,msg.color,msg.gamestart);
+                      //RCLCPP_INFO(this->get_logger(), "自身金币: %d color: %d, gamestart: %d",msg.remaining_gold_coin,msg.color,msg.gamestart);
 
                       }
                       else
@@ -285,7 +285,7 @@ void RMSerialDriver::sendData()
     }
     else{
       try {
-        RCLCPP_INFO(this->get_logger(), "trying to send data");
+        //RCLCPP_INFO(this->get_logger(), "trying to send data");
         uint16_t CRC_check = 0x0000;
         uint16_t CRC16_init = 0xFFFF;
         //sendpacket.nav_x = 1000;
@@ -293,14 +293,15 @@ void RMSerialDriver::sendData()
         //sendpacket.naving = true;
         CRC_check = crc16::Get_CRC16_Check_Sum(reinterpret_cast<uint8_t *>(&sendpacket), sizeof(sendpacket) - 2, CRC16_init);
 
-        //std::cout << "CRC_check: " << CRC_check << std::endl;
+        std::cout << "CRC_check: " << CRC_check << std::endl;
+        std::cout <<  sizeof(sendpacket) - 2 << std::endl;
         
         sendpacket.checksum = CRC_check;
 
         std::vector<uint8_t> data = toVector(sendpacket);
 
         serial_driver_->port()->send(data);
-       //std::cout<<  sendpacket.nav_x << std::endl;
+       std::cout<<  sendpacket.shangpo << std::endl;
       } catch (const std::exception & ex) {
         RCLCPP_ERROR(get_logger(), "Error while sending data: %s", ex.what());
         reopenPort();
@@ -329,7 +330,7 @@ void RMSerialDriver::decisionSendData(const rm_decision_interfaces::msg::ToSeria
 {
     sendpacket.header = 0xA5;
     sendpacket.sentry_cmd = msg->sentry_cmd;
-    // sendpacket.diff_yaw = msg->diff_yaw;
+    sendpacket.diff_yaw = msg->diff_yaw;
     sendpacket.shangpo = msg->shangpo;
     
     //crc16::Append_CRC16_Check_Sum(reinterpret_cast<uint8_t *>(&packet), sizeof(packet));
