@@ -339,6 +339,7 @@ namespace rm_decision
          if(isinpo(po_name[i],currentpose)){
             shangpo = true;
             diffyaw = getyawdiff(po_name[i][0],po_name[i][1]);
+            RCLCPP_INFO(this->get_logger(), "在坡 diffyaw=%f", diffyaw);
          }
          else{
             shangpo = false;
@@ -432,7 +433,8 @@ namespace rm_decision
     float Commander::getyawdiff(geometry_msgs::msg::PoseStamped a, geometry_msgs::msg::PoseStamped b){
        float diffyaw, goalyaw;
        goalyaw = atan((b.pose.position.y - a.pose.position.y)/(b.pose.position.x - a.pose.position.x));
-       diffyaw = goalyaw - currentpose.pose.orientation.z;
+       diffyaw = (goalyaw - currentpose.pose.orientation.z)*(180.0/M_PI);
+       diffyaw = fmod(diffyaw + 360, 360) - 180;
        return diffyaw;
     }
 
