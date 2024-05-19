@@ -508,16 +508,14 @@ namespace IG_LIO
                         shared_data_->offset_rot = new_offset_rot;
                         shared_data_->offset_pos = new_offset_pos;
                         RCLCPP_INFO(rclcpp::get_logger("localizer"), "change, diff: %f, yaw_diff: %f, close_count_: %i", diff, yaw_diff, close_count_);
-                        if (diff < 0.15 && yaw_diff < 0.1){
+                        if (diff < 0.15 && yaw_diff < 0.2){
                             close_count_++;
                             if (close_count_ == 1){
                                 dis_thresh_ = 0.15;
-                                yaw_thresh_ = 0.1;
+                                yaw_thresh_ = 0.2;
                                 RCLCPP_INFO(rclcpp::get_logger("localizer"), "first close");
                             }
                             if (close_count_ > 2){
-                                dis_thresh_ = 0.1;
-                                yaw_thresh_ = 0.05;
                                 RCLCPP_INFO(rclcpp::get_logger("localizer"), "lock");
                                 rate_=icp_rate_;
                             }

@@ -31,58 +31,58 @@ RMSerialDriver::RMSerialDriver(const rclcpp::NodeOptions & options)
   RCLCPP_INFO(get_logger(), "Start RMSerialDriver!");
 
   getParams();
-  tf_buffer_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());
-  tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
-  static_broadcaster = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
-  //gamemap下的两点坐标
-  double x0 = 5.0;
-  double y0 = 5.0;
-  double x1 = 5.0;
-  double y1 = 5.0;
-  //check 点坐标
-  double a = 5.0;
-  double b = 5.0;
-  //标定
-  double yaw = atan((y3 - y2) / (x3 - x2)) - atan((y1 - y0) / (x1 - x0));
-  double dx = x2 - x0*cos(yaw) + y0*sin(yaw);
-  double dy = y2 - x0*sin(yaw) - y0*cos(yaw);
+  // tf_buffer_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());
+  // tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+  // static_broadcaster = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
+  // //gamemap下的两点坐标
+  // double x0 = 5.0;
+  // double y0 = 5.0;
+  // double x1 = 5.0;
+  // double y1 = 5.0;
+  // //check 点坐标
+  // double a = 5.0;
+  // double b = 5.0;
+  // //标定
+  // double yaw = atan((y3 - y2) / (x3 - x2)) - atan((y1 - y0) / (x1 - x0));
+  // double dx = x2 - x0*cos(yaw) + y0*sin(yaw);
+  // double dy = y2 - x0*sin(yaw) - y0*cos(yaw);
 
-  geometry_msgs::msg::TransformStamped static_transform;
-  static_transform.header.frame_id = "map";
-  static_transform.child_frame_id = "gamemap";
-  static_transform.transform.translation.x = dx;
-  static_transform.transform.translation.y = dy;
-  static_transform.transform.translation.z = 0.0;
-  tf2::Quaternion quat;
-  quat.setRPY(0.0, 0.0, yaw); // Roll, Pitch, Yaw
-  static_transform.transform.rotation.x = quat.x();
-  static_transform.transform.rotation.y = quat.y();
-  static_transform.transform.rotation.z = quat.z();
-  static_transform.transform.rotation.w = quat.w();
-  static_broadcaster->sendTransform(static_transform);
+  // geometry_msgs::msg::TransformStamped static_transform;
+  // static_transform.header.frame_id = "map";
+  // static_transform.child_frame_id = "gamemap";
+  // static_transform.transform.translation.x = dx;
+  // static_transform.transform.translation.y = dy;
+  // static_transform.transform.translation.z = 0.0;
+  // tf2::Quaternion quat;
+  // quat.setRPY(0.0, 0.0, yaw); // Roll, Pitch, Yaw
+  // static_transform.transform.rotation.x = quat.x();
+  // static_transform.transform.rotation.y = quat.y();
+  // static_transform.transform.rotation.z = quat.z();
+  // static_transform.transform.rotation.w = quat.w();
+  // static_broadcaster->sendTransform(static_transform);
 
-  // check transform
-  geometry_msgs::msg::PoseStamped pose_stamped;
-  pose_stamped.header.frame_id = "gamemap";
-  pose_stamped.pose.position.x = a;
-  pose_stamped.pose.position.y = b;
-  pose_stamped.pose.position.z = 0.0;
-  pose_stamped.pose.orientation.x = 0.0;
-  pose_stamped.pose.orientation.y = 0.0;
-  pose_stamped.pose.orientation.z = 0.0;
-  pose_stamped.pose.orientation.w = 1.0;
-  geometry_msgs::msg::PoseStamped check_pose;
-  try
-  {
-    tf_buffer_->transform(pose_stamped, check_pose, "map");
-  }
-  catch (tf2::TransformException & ex)
-  {
-    RCLCPP_WARN(this->get_logger(), "Transform error: %s", ex.what());
-    return;
-  }
-  double error_dis = sqrt(pow(check_pose.pose.position.x - a1, 2) + pow(check_pose.pose.position.y - b1, 2));
-  RCLCPP_INFO(this->get_logger(), "Transform error: %f", error_dis);
+  // // check transform
+  // geometry_msgs::msg::PoseStamped pose_stamped;
+  // pose_stamped.header.frame_id = "gamemap";
+  // pose_stamped.pose.position.x = a;
+  // pose_stamped.pose.position.y = b;
+  // pose_stamped.pose.position.z = 0.0;
+  // pose_stamped.pose.orientation.x = 0.0;
+  // pose_stamped.pose.orientation.y = 0.0;
+  // pose_stamped.pose.orientation.z = 0.0;
+  // pose_stamped.pose.orientation.w = 1.0;
+  // geometry_msgs::msg::PoseStamped check_pose;
+  // try
+  // {
+  //   tf_buffer_->transform(pose_stamped, check_pose, "map");
+  // }
+  // catch (tf2::TransformException & ex)
+  // {
+  //   RCLCPP_WARN(this->get_logger(), "Transform error: %s", ex.what());
+  //   return;
+  // }
+  // double error_dis = sqrt(pow(check_pose.pose.position.x - a1, 2) + pow(check_pose.pose.position.y - b1, 2));
+  // RCLCPP_INFO(this->get_logger(), "Transform error: %f", error_dis);
 
   // Create Publisher
   to_decision_pub_ = this->create_publisher<rm_decision_interfaces::msg::FromSerial>("fromjudge", 10);
@@ -289,7 +289,7 @@ void RMSerialDriver::sendData()
         uint16_t CRC_check = 0x0000;
         uint16_t CRC16_init = 0xFFFF;
         //sendpacket.nav_x = 1000;
-        sendpacket.shangpo = true;
+        //sendpacket.shangpo = true;
         //sendpacket.naving = true;
         CRC_check = crc16::Get_CRC16_Check_Sum(reinterpret_cast<uint8_t *>(&sendpacket), sizeof(sendpacket) - 2, CRC16_init);
 
@@ -317,8 +317,8 @@ void RMSerialDriver::navSendData(const geometry_msgs::msg::Twist& cmd_vel)
 
     sendpacket.header = 0xA5;
     sendpacket.naving = true;
-    sendpacket.nav_x = -cmd_vel.linear.y*6000;
-    sendpacket.nav_y = cmd_vel.linear.x*6000;
+    sendpacket.nav_x = -cmd_vel.linear.y*10000;
+    sendpacket.nav_y = cmd_vel.linear.x*10000;
     // std::cout << sendpacket.nav_x << sendpacket.nav_y <<std::endl;
     
     //crc16::Append_CRC16_Check_Sum(reinterpret_cast<uint8_t *>(&sendpacket), sizeof(sendpacket));
@@ -329,7 +329,7 @@ void RMSerialDriver::decisionSendData(const rm_decision_interfaces::msg::ToSeria
 {
     sendpacket.header = 0xA5;
     sendpacket.sentry_cmd = msg->sentry_cmd;
-    sendpacket.diff_yaw = msg->diff_yaw;
+    // sendpacket.diff_yaw = msg->diff_yaw;
     sendpacket.shangpo = msg->shangpo;
     
     //crc16::Append_CRC16_Check_Sum(reinterpret_cast<uint8_t *>(&packet), sizeof(packet));

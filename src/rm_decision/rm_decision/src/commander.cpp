@@ -300,7 +300,7 @@ namespace rm_decision
       RCLCPP_INFO(this->get_logger(), "开始传入导航点");
       geometry_msgs::msg::PoseStamped pose;
       std::vector<double> pose_list;
-      std::vector<std::string> route_list = {"route1", "route2", "route3", "route4"};
+      std::vector<std::string> route_list = {"route1", "route2", "route3"};
       std::vector<std::string> area_list = {"po_area1", "po_area2", "po_area3"};
       std::vector<std::vector<geometry_msgs::msg::PoseStamped>>::iterator list = list_name.begin();
       std::vector<std::vector<geometry_msgs::msg::PoseStamped>>::iterator area = po_name.begin();
@@ -320,7 +320,7 @@ namespace rm_decision
       }
       for (auto it = area_list.begin(); it != area_list.end(); it++)
       {
-         this->declare_parameter(*it, area_list);
+         this->declare_parameter(*it, pose_list);
          auto pose_param = this->get_parameter(*it).as_double_array();
          processPoses(pose_param, *area);
          RCLCPP_INFO(this->get_logger(), "%s随机导航点个数: %ld", it->c_str(), (*area).size());
