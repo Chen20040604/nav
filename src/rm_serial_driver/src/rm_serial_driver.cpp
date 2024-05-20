@@ -244,6 +244,7 @@ void RMSerialDriver::receiveData()
                       //std::cout<< "received from serial successfully "<< std::endl;
                       //std::cout<< packet.remaining_gold_coin<< std::endl;
                       to_decision_pub_->publish(msg);
+                      bigyaw = packet.big_yaw;
                       receive_flag = false;
                       
                       //RCLCPP_INFO(this->get_logger(), "自身金币: %d color: %d, gamestart: %d",msg.remaining_gold_coin,msg.color,msg.gamestart);
@@ -330,7 +331,7 @@ void RMSerialDriver::decisionSendData(const rm_decision_interfaces::msg::ToSeria
 {
     sendpacket.header = 0xA5;
     sendpacket.sentry_cmd = msg->sentry_cmd;
-    sendpacket.diff_yaw = msg->diff_yaw;
+    sendpacket.goal_yaw = fmod(msg->diff_yaw + bigyaw +180 , 360) - 180;
     sendpacket.shangpo = msg->shangpo;
     
     //crc16::Append_CRC16_Check_Sum(reinterpret_cast<uint8_t *>(&packet), sizeof(packet));

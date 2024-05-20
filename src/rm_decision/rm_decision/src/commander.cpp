@@ -438,7 +438,7 @@ namespace rm_decision
        float diffyaw, goalyaw;
        goalyaw = atan((b.pose.position.y - a.pose.position.y)/(b.pose.position.x - a.pose.position.x));
        RCLCPP_INFO(this->get_logger(), "goal%f cur %f", goalyaw,currentpose.pose.orientation.z);
-       diffyaw = (goalyaw - currentpose.pose.orientation.z*M_PI)*(180.0/M_PI);
+       diffyaw = (goalyaw - asin(currentpose.pose.orientation.z)*2)*(180.0/M_PI);
        diffyaw = fmod(diffyaw + 180, 360) - 180;
        return diffyaw;
     }

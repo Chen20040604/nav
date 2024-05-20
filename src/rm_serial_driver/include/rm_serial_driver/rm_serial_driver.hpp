@@ -93,6 +93,7 @@ private:
   std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_broadcaster;
 
   int closecount=0;
+  double bigyaw;
   
 };
 }  // namespace rm_serial_driver

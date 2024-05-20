@@ -31,6 +31,8 @@ struct ReceivePacket
   uint16_t blue_7;
   uint16_t blue_outpost_HP;  
   uint16_t blue_base_HP;
+
+  double big_yaw;
   
   // float target_pos_x;  //目标位置
   // float target_pos_y;
@@ -49,7 +51,7 @@ struct SendPacket
   float nav_y;
 
   uint32_t sentry_cmd; // 哨兵发给裁判系统的自主决策命令，如选择复活，买弹等，见裁判系统
-  float diff_yaw; 
+  float goal_yaw; 
   // uint8_t intention;    //用于哨兵的路径显示
   // uint16_t start_pos_x;
   // uint16_t start_pos_y;
