@@ -4,9 +4,13 @@
     <!-- Description of Node Models (used by Groot) -->
     <TreeNodesModel>
         <Action ID="BuyAmmoRemotely_handle" editable="true"/>
+        <Action ID="BuyAmmo_handle" editable="true"/>
         <Action ID="BuyHp_handle" editable="true"/>
         <Action ID="BuyToRelive_handle" editable="true"/>
         <Action ID="Gimbal_handle" editable="true"/>
+        <Action ID="GoToEnemyOutpose_handle" editable="true"/>
+        <Action ID="GoToStopEngineer_handle" editable="true"/>
+        <Action ID="GoToStopHero_handle" editable="true"/>
         <Action ID="Guard" editable="true"/>
         <Condition ID="IfAddHp" editable="true"/>
         <Condition ID="IfAsked" editable="true"/>
@@ -16,8 +20,17 @@
         <Condition ID="IfBuyHp" editable="true"/>
         <Condition ID="IfBuyToRelive" editable="true"/>
         <Condition ID="IfDefend" editable="true"/>
+        <Condition ID="IfGoToEnemyOutpose" editable="true"/>
+        <Condition ID="IfGoToStopEngineer" editable="true"/>
+        <Condition ID="IfGoToStopHero" editable="true"/>
         <Condition ID="IfGuard" editable="true"/>
+        <Condition ID="IfOutposeAlive" editable="true"/>
         <Action ID="MoveAround" editable="true"/>
+        <Condition ID="S1" editable="true"/>
+        <Condition ID="S2" editable="true"/>
+        <Action ID="S2GoToOutpose" editable="true"/>
+        <Condition ID="S3" editable="true"/>
+        <Action ID="S3Patro" editable="true"/>
         <Action ID="addhp_handle" editable="true"/>
         <Action ID="attack_handle" editable="true"/>
         <Action ID="base_handle" editable="true"/>
@@ -25,7 +38,6 @@
         <Action ID="dafu_handle" editable="true"/>
         <Condition ID="dafu_ordered" editable="true"/>
         <Action ID="defend_handle" editable="true"/>
-        <Condition ID="ifrelive" editable="true"/>
         <Action ID="outpose_handle" editable="true"/>
         <Condition ID="outpose_ordered" editable="true"/>
         <Condition ID="wait_for_start" editable="true"/>

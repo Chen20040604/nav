@@ -1,15 +1,35 @@
+# you may need to reset the nav points depend on your color
 /rm_decision_node:
   ros__parameters:
-    route1: [-0.5, 1.6, 0.0,
+    home_pose: [ 0.0, 0.0, 0.0 ]
+
+    strategy: 2
+
+    #the area of po
+    x_min: 0.0
+    x_max: 1.0
+    y_min: 0.0
+    y_max: 1.0
+
+    Guard_points: [ -0.5, 1.6, 0.0,
               -0.5, 2.4, 0.0,
-             -1.0, 2.4, 0.0]
-    route2: [-2.4, 1.0, 0.0,
-             -1.7, 1.0, 0.0]
-    route3: [-2.475, 1.65, 0.0,
-             -2.475, 2.65, 0.0]
-    route4: [-2.4, 0.0, 0.0,
-             -2.7, 1.0, 0.0]        
-    home_pose: [0.0, 0.0, 0.0]
+              -1.0, 2.4, 0.0 ]
+    self_addhp_point: [ 0.0, 0.0, 0.0 ]
+    self_base_point: [ 0.0, 0.0, 0.0 ]
+
+    S1_Stop_Engineer_point: [ 0.0, 0.0, 0.0 ]
+    S1_Stop_Hero_point: [ 0.0, 0.0, 0.0 ]
+    S1_Outpost_point: [ 0.0, 0.0, 0.0 ]
+
+    S2_Outpose_point: [ 0.0, 0.0, 0.0 ]
+
+    S3_Patro_points: [ 0.0, 0.0, 0.0,
+                          1.0, 2.0, 0.0]
+
+    #will be used if shangpo is not available
+    Guard_points2: [0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0]
     po_area1: [-2.0, 1.0, 0.0,
               -2.0, 2.0, 0.0,
               -3.0, 2.0, 0.0,
@@ -22,4 +42,3 @@
               200.0, 200.0, 0.0,
               300.0, 200.0, 0.0,
               300.0, 100.0, 0.0]
-
